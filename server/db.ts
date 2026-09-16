@@ -153,10 +153,77 @@ export function initDatabase() {
       tenant_id TEXT REFERENCES tenants(id),
       business_id TEXT REFERENCES businesses(id)
     );
+
+    CREATE TABLE IF NOT EXISTS checklist_templates (
+      id TEXT PRIMARY KEY,
+      category TEXT NOT NULL,
+      sector_applicability TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      plain_language_help TEXT,
+      regulatory_body TEXT,
+      legal_reference TEXT,
+      penalty_risk_text TEXT,
+      scoring_weight INTEGER DEFAULT 3,
+      last_verified_date TEXT,
+      source_url TEXT
+    );
   `);
+
+  // Ensure checklist templates are populated
+  ensureChecklistTemplates();
 
   // Seed default data if empty
   seedInitialData();
+}
+
+function ensureChecklistTemplates() {
+  const templateCount = (db.prepare('SELECT count(*) as count FROM checklist_templates').get() as any)?.count || 0;
+  if (templateCount === 0) {
+    const insertTemplate = db.prepare(`
+      INSERT OR REPLACE INTO checklist_templates (
+        id, category, sector_applicability, title, description,
+        plain_language_help, regulatory_body, legal_reference,
+        penalty_risk_text, scoring_weight, last_verified_date, source_url
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    for (const item of UNIVERSAL_CHECKLIST_ITEMS) {
+      insertTemplate.run(
+        item.id,
+        item.category,
+        'universal',
+        item.title,
+        item.description,
+        item.plainLanguageHelp || '',
+        item.regulatoryBody,
+        item.legalReference,
+        item.penaltyRiskText,
+        item.scoringWeight,
+        item.lastVerifiedDate || '2026-08-01',
+        item.sourceUrl || 'https://www.gov.uk/'
+      );
+    }
+
+    for (const [secKey, items] of Object.entries(SECTOR_SPECIFIC_CHECKLISTS)) {
+      for (const item of items) {
+        insertTemplate.run(
+          item.id,
+          item.category,
+          secKey,
+          item.title,
+          item.description,
+          item.plainLanguageHelp || '',
+          item.regulatoryBody,
+          item.legalReference,
+          item.penaltyRiskText,
+          item.scoringWeight,
+          item.lastVerifiedDate || '2026-08-01',
+          item.sourceUrl || 'https://www.gov.uk/'
+        );
+      }
+    }
+  }
 }
 
 function seedInitialData() {
@@ -648,7 +715,7 @@ function seedInitialData() {
       courses: [
         {
           id: 'course-care-meds',
-          title: 'Safe Administration of Medication in Adult Social Care (NICE SC1)',
+          title: 'Safe Handling & Administration of Medicines',
           status: 'completed',
           progress: 100,
           completedDate: '2025-04-12',
@@ -656,8 +723,8 @@ function seedInitialData() {
           score: 98,
         },
         {
-          id: 'course-care-safeguarding',
-          title: 'Safeguarding Vulnerable Adults (Level 3 - Managers & Leads)',
+          id: 'course-care-safeguard-l3',
+          title: 'Safeguarding Adults & Children (Level 3 - Lead & Manager)',
           status: 'completed',
           progress: 100,
           completedDate: '2025-06-01',
@@ -665,8 +732,8 @@ function seedInitialData() {
           score: 96,
         },
         {
-          id: 'course-care-dementia',
-          title: 'Person-Centred Dementia Care (Tier 2 Standard)',
+          id: 'course-care-ipc',
+          title: 'Infection Prevention & Control (IPC) in Care Environments',
           status: 'completed',
           progress: 100,
           completedDate: '2025-05-20',
@@ -674,8 +741,8 @@ function seedInitialData() {
           score: 94,
         },
         {
-          id: 'course-care-dols',
-          title: 'Mental Capacity Act (MCA) & Deprivation of Liberty Safeguards (DoLS)',
+          id: 'course-care-mca-dols',
+          title: 'Mental Capacity Act (MCA) & Deprivation of Liberty (DoLS)',
           status: 'completed',
           progress: 100,
           completedDate: '2025-06-15',
@@ -697,7 +764,7 @@ function seedInitialData() {
       courses: [
         {
           id: 'course-care-meds',
-          title: 'Safe Administration of Medication in Adult Social Care (NICE SC1)',
+          title: 'Safe Handling & Administration of Medicines',
           status: 'completed',
           progress: 100,
           completedDate: '2025-05-10',
@@ -705,8 +772,8 @@ function seedInitialData() {
           score: 92,
         },
         {
-          id: 'course-care-safeguarding',
-          title: 'Safeguarding Vulnerable Adults (Level 3 - Managers & Leads)',
+          id: 'course-care-safeguard-l3',
+          title: 'Safeguarding Adults & Children (Level 3 - Lead & Manager)',
           status: 'completed',
           progress: 100,
           completedDate: '2025-07-01',
@@ -727,8 +794,8 @@ function seedInitialData() {
       rtwDate: '2024-02-28',
       courses: [
         {
-          id: 'course-care-safeguarding',
-          title: 'Safeguarding Vulnerable Adults',
+          id: 'course-care-safeguard-l2',
+          title: 'Safeguarding Adults at Risk (Level 2 - Care Staff)',
           status: 'completed',
           progress: 100,
           completedDate: '2025-08-01',
@@ -736,8 +803,8 @@ function seedInitialData() {
           score: 90,
         },
         {
-          id: 'course-care-dementia',
-          title: 'Person-Centred Dementia Care (Tier 2 Standard)',
+          id: 'course-care-cert',
+          title: 'The Care Certificate (All 15 Standards)',
           status: 'in_progress',
           progress: 65,
         },

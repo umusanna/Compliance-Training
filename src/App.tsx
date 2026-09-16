@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   BusinessProfile,
   Learner,
   AuditChecklistItem,
   Course,
   LearnerCourseRecord,
+  UserRole,
 } from './types';
 import { SAMPLE_BUSINESS_PRESETS } from './data/sampleProfiles';
 import {
@@ -18,6 +19,8 @@ import {
 } from './data/initialChecklists';
 import { COURSES_CATALOG, SECTOR_METADATA } from './data/regulatoryStandards';
 import { runComplianceAudit } from './utils/complianceEngine';
+import { api } from './services/api';
+import { useToast } from './context/ToastContext';
 
 import { Header } from './components/Header';
 import { AuditOverview } from './components/AuditOverview';
@@ -25,11 +28,15 @@ import { BusinessProfileView } from './components/BusinessProfileView';
 import { ManagerChecklistsView } from './components/ManagerChecklistsView';
 import { LearnersRegisterView } from './components/LearnersRegisterView';
 import { TrainingSolutionsView } from './components/TrainingSolutionsView';
+import { AdminPortfolioView } from './components/AdminPortfolioView';
+import { AdminRegulatoryView } from './components/AdminRegulatoryView';
 import { LearnerModal } from './components/LearnerModal';
 import { EnrolCourseModal } from './components/EnrolCourseModal';
 import { AuditReportModal } from './components/AuditReportModal';
+import { GuidedOnboardingModal } from './components/modals/GuidedOnboardingModal';
 
 export default function App() {
+  const { showToast } = useToast();
   const initialPreset = SAMPLE_BUSINESS_PRESETS.food_hospitality;
 
   // Primary Application State
@@ -39,88 +46,260 @@ export default function App() {
     ...UNIVERSAL_CHECKLIST_ITEMS,
     ...(SECTOR_SPECIFIC_CHECKLISTS.food_hospitality || []),
   ]);
+  const [businesses, setBusinesses] = useState<BusinessProfile[]>([]);
+  const [currentRole, setCurrentRole] = useState<UserRole>('business_manager');
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'business' | 'checklists' | 'learners' | 'solutions'
+    'overview' | 'business' | 'checklists' | 'learners' | 'solutions' | 'portfolio' | 'regulatory'
   >('overview');
 
   // Modal States
   const [showReportModal, setShowReportModal] = useState(false);
   const [showLearnerModal, setShowLearnerModal] = useState(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
   const [editingLearner, setEditingLearner] = useState<Learner | null>(null);
   const [selectedLearnerForEnrol, setSelectedLearnerForEnrol] = useState<Learner | null>(null);
 
-  // Notification Toast State
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  // Initialize data from SQLite backend
+  useEffect(() => {
+    const initData = async () => {
+      try {
+        let list = await api.fetchBusinesses();
+        if (!Array.isArray(list) || list.length === 0) {
+          await api.resetDemoDatabase();
+          list = await api.fetchBusinesses();
+        }
+        if (Array.isArray(list) && list.length > 0) {
+          setBusinesses(list);
+          const savedId = localStorage.getItem('est_active_business_id');
+          const targetBiz = list.find((b) => b.id === savedId) || list[0];
+          setProfile(targetBiz);
+          localStorage.setItem('est_active_business_id', targetBiz.id);
+          try {
+            const [fetchedLearners, fetchedChecklists] = await Promise.all([
+              api.fetchLearners(targetBiz.id),
+              api.fetchChecklists(targetBiz.id),
+            ]);
+            setLearners(Array.isArray(fetchedLearners) ? fetchedLearners : []);
+            setChecklists(Array.isArray(fetchedChecklists) ? fetchedChecklists : []);
+          } catch (err) {
+            console.warn('Could not load learners/checklists from backend', err);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch businesses from backend', err);
+      }
+    };
+    initData();
+  }, []);
 
-  const triggerToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4000);
+  // Switch Business from SQLite database
+  const handleSelectBusinessId = async (id: string) => {
+    try {
+      const [biz, bLearners, bChecklists] = await Promise.all([
+        api.fetchBusiness(id),
+        api.fetchLearners(id),
+        api.fetchChecklists(id),
+      ]);
+      setProfile(biz);
+      setLearners(Array.isArray(bLearners) ? bLearners : []);
+      setChecklists(Array.isArray(bChecklists) ? bChecklists : []);
+      localStorage.setItem('est_active_business_id', id);
+      showToast(`Switched client to ${biz.name}`, 'info');
+    } catch (err) {
+      console.error('Failed to switch business', err);
+      showToast('Could not load client business data', 'error');
+    }
   };
 
   // Switch Business Preset
-  const handleSelectPreset = (presetKey: string) => {
+  const handleSelectPreset = async (presetKey: string) => {
     const preset = SAMPLE_BUSINESS_PRESETS[presetKey];
     if (!preset) return;
 
-    setProfile(preset.profile);
-    setLearners(preset.learners);
+    // Check if a business matching this preset sector already exists in SQLite
+    const existing = businesses.find((b) => b.sector === presetKey);
+    if (existing) {
+      await handleSelectBusinessId(existing.id);
+      showToast(`Loaded existing client ${existing.name} (${SECTOR_METADATA[existing.sector].shortName})`, 'info');
+      return;
+    }
 
-    // Merge universal checklists with this sector's checklists
-    const sectorItems = SECTOR_SPECIFIC_CHECKLISTS[preset.profile.sector] || [];
-    setChecklists([...UNIVERSAL_CHECKLIST_ITEMS, ...sectorItems]);
-
-    triggerToast(`Loaded preset for ${preset.profile.name} (${SECTOR_METADATA[preset.profile.sector].shortName})`);
+    try {
+      const created = await api.createBusiness({
+        ...preset.profile,
+        id: preset.profile.id,
+      });
+      for (const l of preset.learners) {
+        await api.createLearner(created.id, l);
+      }
+      const updatedList = await api.fetchBusinesses();
+      setBusinesses(updatedList);
+      await handleSelectBusinessId(created.id);
+      showToast(`Created & loaded ${preset.profile.name} in database`, 'success');
+    } catch (err) {
+      console.error('Failed to persist preset business to database', err);
+      setProfile(preset.profile);
+      setLearners(preset.learners);
+      const sectorItems = SECTOR_SPECIFIC_CHECKLISTS[preset.profile.sector] || [];
+      setChecklists([...UNIVERSAL_CHECKLIST_ITEMS, ...sectorItems]);
+      showToast(`Loaded preset for ${preset.profile.name}`, 'info');
+    }
   };
 
   // Update Profile
-  const handleUpdateProfile = (updated: Partial<BusinessProfile>) => {
+  const handleUpdateProfile = async (updated: Partial<BusinessProfile>) => {
     const newProfile = { ...profile, ...updated };
     setProfile(newProfile);
 
+    if (profile.id) {
+      try {
+        await api.updateBusiness(profile.id, updated);
+      } catch (err) {
+        console.warn('Failed to update business on server', err);
+      }
+    }
+
     // If sector changed, refresh sector-specific checklists
     if (updated.sector && updated.sector !== profile.sector) {
-      const sectorItems = SECTOR_SPECIFIC_CHECKLISTS[updated.sector] || [];
-      const nonSectorItems = checklists.filter((c) => c.category !== 'sector_specific');
-      setChecklists([...nonSectorItems, ...sectorItems]);
-      triggerToast(`Switched sector to ${SECTOR_METADATA[updated.sector].name}. Regulatory audit standards updated.`);
+      try {
+        const refreshedChecklists = await api.fetchChecklists(profile.id);
+        if (Array.isArray(refreshedChecklists) && refreshedChecklists.length > 0) {
+          setChecklists(refreshedChecklists);
+        } else {
+          const sectorItems = SECTOR_SPECIFIC_CHECKLISTS[updated.sector] || [];
+          const nonSectorItems = checklists.filter((c) => c.category !== 'sector_specific');
+          setChecklists([...nonSectorItems, ...sectorItems]);
+        }
+      } catch {
+        const sectorItems = SECTOR_SPECIFIC_CHECKLISTS[updated.sector] || [];
+        const nonSectorItems = checklists.filter((c) => c.category !== 'sector_specific');
+        setChecklists([...nonSectorItems, ...sectorItems]);
+      }
+      showToast(`Switched sector to ${SECTOR_METADATA[updated.sector].name}. Regulatory audit standards updated.`, 'info');
+    } else {
+      showToast('Business profile updated successfully', 'success');
     }
   };
 
   // Checklist updates
-  const handleUpdateChecklistItem = (id: string, updated: Partial<AuditChecklistItem>) => {
+  const handleUpdateChecklistItem = async (id: string, updated: Partial<AuditChecklistItem>) => {
     setChecklists((prev) =>
       prev.map((item) => (item.id === id ? { ...item, ...updated } : item))
     );
+    if (profile.id) {
+      try {
+        await api.updateChecklist(profile.id, id, updated);
+      } catch (err) {
+        console.warn('Failed to persist checklist update', err);
+      }
+    }
   };
 
-  const handleAddChecklistItem = (newItem: AuditChecklistItem) => {
+  const handleAddChecklistItem = async (newItem: AuditChecklistItem) => {
     setChecklists((prev) => [newItem, ...prev]);
-    triggerToast(`Added checklist requirement: ${newItem.title}`);
+    if (profile?.id) {
+      try {
+        await api.createChecklistItem(profile.id, newItem);
+      } catch (err) {
+        console.warn('Failed to persist checklist item', err);
+      }
+    }
+    showToast(`Added checklist requirement: ${newItem.title}`, 'success');
   };
 
   // Learner operations
-  const handleSaveLearner = (learner: Learner) => {
+  const handleSaveLearner = async (learner: Learner) => {
+    const exists = learners.some((l) => l.id === learner.id);
     setLearners((prev) => {
-      const exists = prev.some((l) => l.id === learner.id);
       if (exists) {
         return prev.map((l) => (l.id === learner.id ? learner : l));
       } else {
         return [learner, ...prev];
       }
     });
-    triggerToast(`Saved learner ${learner.name} (${learner.jobTitle})`);
+
+    if (profile.id) {
+      try {
+        if (exists) {
+          await api.updateLearner(profile.id, learner.id, learner);
+        } else {
+          await api.createLearner(profile.id, learner);
+        }
+      } catch (err) {
+        console.warn('Failed to persist learner on server', err);
+      }
+    }
+    showToast(`Saved learner ${learner.name} (${learner.jobTitle})`, 'success');
   };
 
-  const handleUpdateLearner = (id: string, updated: Partial<Learner>) => {
+  const handleUpdateLearner = async (id: string, updated: Partial<Learner>) => {
     setLearners((prev) =>
       prev.map((l) => (l.id === id ? { ...l, ...updated } : l))
     );
+    if (profile.id) {
+      try {
+        await api.updateLearner(profile.id, id, updated);
+      } catch (err) {
+        console.warn('Failed to update learner on server', err);
+      }
+    }
   };
 
-  const handleSaveLearnerCourseRecord = (record: LearnerCourseRecord) => {
+  const handleArchiveLearner = async (learnerId: string, reason: string) => {
+    if (profile.id) {
+      try {
+        await api.archiveLearner(profile.id, learnerId, reason);
+      } catch (err) {
+        console.warn('Failed to archive learner on server', err);
+      }
+    }
+    setLearners((prev) =>
+      prev.map((l) =>
+        l.id === learnerId
+          ? {
+              ...l,
+              isArchived: true,
+              archivedReason: reason,
+              archivedAt: new Date().toISOString(),
+            }
+          : l
+      )
+    );
+    showToast('Learner archived', 'info');
+  };
+
+  const handleRestoreLearner = async (learnerId: string) => {
+    if (profile.id) {
+      try {
+        await api.restoreLearner(profile.id, learnerId);
+      } catch (err) {
+        console.warn('Failed to restore learner on server', err);
+      }
+    }
+    setLearners((prev) =>
+      prev.map((l) =>
+        l.id === learnerId
+          ? { ...l, isArchived: false, archivedReason: undefined, archivedAt: undefined }
+          : l
+      )
+    );
+    showToast('Learner restored to active staff', 'success');
+  };
+
+  const handleBulkImportSuccess = async () => {
+    if (profile.id) {
+      try {
+        const updatedLearners = await api.fetchLearners(profile.id);
+        setLearners(updatedLearners);
+        showToast('Learner records reloaded from database', 'info');
+      } catch (err) {
+        console.warn('Failed to refresh learners after import', err);
+      }
+    }
+  };
+
+  const handleSaveLearnerCourseRecord = async (record: LearnerCourseRecord) => {
     if (!selectedLearnerForEnrol) return;
     const learnerId = selectedLearnerForEnrol.id;
 
@@ -137,11 +316,27 @@ export default function App() {
       })
     );
 
-    triggerToast(`Enrolled ${selectedLearnerForEnrol.name} in ${record.courseTitle}`);
+    if (profile.id) {
+      try {
+        await api.enrolCourse(profile.id, learnerId, {
+          courseId: record.courseId,
+          courseTitle: record.courseTitle,
+          status: record.status,
+          progressPercent: record.progressPercent,
+          completedDate: record.completedDate,
+          expiryDate: record.expiryDate,
+          score: record.score,
+        });
+      } catch (err) {
+        console.warn('Failed to persist course enrollment', err);
+      }
+    }
+
+    showToast(`Enrolled ${selectedLearnerForEnrol.name} in ${record.courseTitle}`, 'success');
   };
 
   // Batch Enrol Action for Course
-  const handleBatchEnrolCourse = (course: Course, targetLearnerIds: string[]) => {
+  const handleBatchEnrolCourse = async (course: Course, targetLearnerIds: string[]) => {
     setLearners((prev) =>
       prev.map((l) => {
         if (targetLearnerIds.includes(l.id)) {
@@ -167,7 +362,22 @@ export default function App() {
       })
     );
 
-    triggerToast(`Enrolled ${targetLearnerIds.length} employees in ${course.title} via our LMS`);
+    if (profile.id) {
+      for (const lid of targetLearnerIds) {
+        try {
+          await api.enrolCourse(profile.id, lid, {
+            courseId: course.id,
+            courseTitle: course.title,
+            status: 'in_progress',
+            progressPercent: 15,
+          });
+        } catch {
+          // ignore individual error
+        }
+      }
+    }
+
+    showToast(`Enrolled ${targetLearnerIds.length} employees in ${course.title} via our LMS`, 'success');
   };
 
   // Quick enrol from Overview
@@ -189,39 +399,105 @@ export default function App() {
     );
   };
 
+  // Role Switcher
+  const handleRoleChange = (newRole: UserRole) => {
+    setCurrentRole(newRole);
+    if (newRole === 'admin') {
+      setActiveTab('portfolio');
+    } else if (activeTab === 'portfolio' || activeTab === 'regulatory') {
+      setActiveTab('overview');
+    }
+    showToast(
+      `Switched to ${
+        newRole === 'admin'
+          ? 'Training Provider Admin'
+          : newRole === 'viewer'
+          ? 'Read-Only Auditor'
+          : 'Business Manager'
+      }`,
+      'info'
+    );
+  };
+
+  // Reset Demo Database
+  const handleResetDemo = async () => {
+    try {
+      await api.resetDemoDatabase();
+      const list = await api.fetchBusinesses();
+      setBusinesses(list);
+      if (list.length > 0) {
+        await handleSelectBusinessId(list[0].id);
+      }
+      showToast('Database reset to default seed state', 'success');
+    } catch (err) {
+      showToast('Failed to reset demo database', 'error');
+    }
+  };
+
+  // Guided Onboarding Complete
+  const handleCompleteOnboarding = async (profileData: Partial<BusinessProfile>) => {
+    try {
+      const res = await api.createBusiness({
+        ...profileData,
+        onboardingCompleted: true,
+      });
+      const newBizId = res.id;
+      const list = await api.fetchBusinesses();
+      setBusinesses(list);
+      await handleSelectBusinessId(newBizId);
+      setShowOnboardingModal(false);
+      showToast('Setup wizard complete: Business profile and statutory framework configured in database.', 'success');
+    } catch (err) {
+      console.error('Failed to complete onboarding', err);
+      showToast('Failed to save onboarded business', 'error');
+    }
+  };
+
   // Audit calculation engine
   const report = useMemo(() => {
     return runComplianceAudit(profile, checklists, learners);
   }, [profile, checklists, learners]);
 
-  return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center space-x-2 animate-bounce">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+  const isReadOnly = currentRole === 'viewer';
 
+  return (
+    <div className="min-h-screen bg-tertiary-950 text-slate-100 flex flex-col font-sans">
       {/* Primary Header */}
       <Header
         currentProfile={profile}
+        businesses={businesses}
+        onSelectBusinessId={handleSelectBusinessId}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onSelectPreset={handleSelectPreset}
         onOpenReport={() => setShowReportModal(true)}
+        onOpenOnboarding={() => setShowOnboardingModal(true)}
+        onResetDemo={handleResetDemo}
         compliancePercent={report.overallScorePercent}
+        currentRole={currentRole}
+        onChangeRole={handleRoleChange}
       />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {activeTab === 'portfolio' && (
+          <AdminPortfolioView
+            onSelectBusiness={(bizId) => {
+              handleSelectBusinessId(bizId);
+              setActiveTab('overview');
+            }}
+          />
+        )}
+
+        {activeTab === 'regulatory' && <AdminRegulatoryView />}
+
         {activeTab === 'overview' && (
           <AuditOverview
             report={report}
             profile={profile}
             onNavigateToTab={setActiveTab}
             onQuickEnrolLearners={handleQuickEnrolFromOverview}
+            readOnly={isReadOnly}
           />
         )}
 
@@ -230,6 +506,7 @@ export default function App() {
             profile={profile}
             onUpdateProfile={handleUpdateProfile}
             registeredLearnerCount={learners.length}
+            readOnly={isReadOnly}
           />
         )}
 
@@ -238,6 +515,7 @@ export default function App() {
             checklists={checklists}
             onUpdateItem={handleUpdateChecklistItem}
             onAddItem={handleAddChecklistItem}
+            readOnly={isReadOnly}
           />
         )}
 
@@ -254,6 +532,10 @@ export default function App() {
               setEditingLearner(null);
               setShowLearnerModal(true);
             }}
+            onBulkImportSuccess={handleBulkImportSuccess}
+            onArchiveLearner={handleArchiveLearner}
+            onRestoreLearner={handleRestoreLearner}
+            readOnly={isReadOnly}
           />
         )}
 
@@ -265,15 +547,16 @@ export default function App() {
               handleBatchEnrolCourse(course, [learnerId])
             }
             onBatchEnrolCourse={handleBatchEnrolCourse}
+            readOnly={isReadOnly}
           />
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-slate-200 py-6 text-xs text-slate-500 mt-12 print:hidden">
+      <footer className="bg-tertiary-900 border-t border-tertiary-800 py-6 text-xs text-slate-400 mt-12 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3">
           <div>
-            <span className="font-semibold text-slate-700">
+            <span className="font-semibold text-slate-200">
               UK Compliance Status Checker & Audit Preparation System
             </span>
             <span className="mx-2">•</span>
@@ -320,6 +603,13 @@ export default function App() {
         report={report}
         checklists={checklists}
         learners={learners}
+      />
+
+      <GuidedOnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+        onComplete={handleCompleteOnboarding}
+        currentProfile={profile}
       />
     </div>
   );

@@ -20,6 +20,10 @@ import {
   Mail,
   CheckCircle2,
   Flame,
+  FileText,
+  Eye,
+  X,
+  Printer,
 } from 'lucide-react';
 import { BusinessProfile, ComplianceAuditReport, Course, AuditSnapshot } from '../types';
 import { SECTOR_METADATA } from '../data/regulatoryStandards';
@@ -33,6 +37,7 @@ interface AuditOverviewProps {
   profile: BusinessProfile;
   onNavigateToTab: (tab: 'business' | 'checklists' | 'learners' | 'solutions') => void;
   onQuickEnrolLearners: (courseId: string) => void;
+  onOpenReportModal?: () => void;
   readOnly?: boolean;
 }
 
@@ -41,6 +46,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
   profile,
   onNavigateToTab,
   onQuickEnrolLearners,
+  onOpenReportModal,
   readOnly = false,
 }) => {
   const { showToast } = useToast();
@@ -51,6 +57,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
   const [snapshots, setSnapshots] = useState<AuditSnapshot[]>([]);
   const [isSavingSnapshot, setIsSavingSnapshot] = useState(false);
   const [showSnapshotHistory, setShowSnapshotHistory] = useState(false);
+  const [selectedSnapshotForView, setSelectedSnapshotForView] = useState<AuditSnapshot | null>(null);
 
   // Load historical snapshots from SQLite
   useEffect(() => {
@@ -115,14 +122,14 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Banner with Business Context & Statutory Readiness */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm p-5 md:p-6 text-slate-100">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl shadow-sm p-5 md:p-6 text-slate-100">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1.5">
             <div className="flex items-center space-x-2.5 flex-wrap">
               <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">
                 {profile.name}
               </h1>
-              <span className="text-xs bg-slate-800 text-emerald-400 font-semibold px-2.5 py-0.5 rounded-full border border-slate-700">
+              <span className="text-xs bg-tertiary-800 text-primary-300 font-semibold px-2.5 py-0.5 rounded-full border border-tertiary-700">
                 {sectorInfo.name}
               </span>
               {profile.tradingName && (
@@ -139,7 +146,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
           {/* Headline Score & Actions */}
           <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
             {/* Headline Score Pill */}
-            <div className="flex items-center bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-x-4 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
+            <div className="flex items-center bg-tertiary-950 border border-tertiary-800 rounded-xl p-3.5 space-x-4 shrink-0 w-full sm:w-auto justify-between sm:justify-start">
               <div className="text-center">
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                   Readiness Score
@@ -150,8 +157,8 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                       report.overallScorePercent >= 80
                         ? 'text-emerald-400'
                         : report.overallScorePercent >= 60
-                        ? 'text-blue-400'
-                        : 'text-amber-400'
+                        ? 'text-primary-400'
+                        : 'text-secondary-400'
                     }`}
                   >
                     {report.overallScorePercent}%
@@ -160,15 +167,15 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                 </div>
               </div>
 
-              <div className="border-l border-slate-800 pl-4 text-left">
+              <div className="border-l border-tertiary-800 pl-4 text-left">
                 <div
                   className={`inline-flex items-center text-xs font-bold px-2.5 py-1 rounded-full ${
                     report.gradeColor === 'emerald'
                       ? 'bg-emerald-950 text-emerald-300 border border-emerald-800'
                       : report.gradeColor === 'blue'
-                      ? 'bg-blue-950 text-blue-300 border border-blue-800'
+                      ? 'bg-primary-950 text-primary-300 border border-primary-800'
                       : report.gradeColor === 'amber'
-                      ? 'bg-amber-950 text-amber-300 border border-amber-800'
+                      ? 'bg-secondary-900/80 text-secondary-300 border border-secondary-700'
                       : 'bg-rose-950 text-rose-300 border border-rose-800'
                   }`}
                 >
@@ -182,15 +189,30 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
 
             {/* Explainer & Action Buttons */}
             <div className="flex flex-col gap-2 w-full sm:w-auto">
-              <button
-                type="button"
-                id="btn-explain-score"
-                onClick={() => setIsExplainModalOpen(true)}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700 transition-colors shadow-sm"
-              >
-                <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
-                <span>How Score is Calculated</span>
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  id="btn-explain-score"
+                  onClick={() => setIsExplainModalOpen(true)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-tertiary-800 hover:bg-tertiary-700 text-slate-200 text-xs font-semibold rounded-lg border border-tertiary-700 transition-colors shadow-sm"
+                >
+                  <HelpCircle className="w-3.5 h-3.5 text-primary-400" />
+                  <span>How Score is Calculated</span>
+                </button>
+
+                {onOpenReportModal && (
+                  <button
+                    type="button"
+                    id="btn-open-dossier"
+                    onClick={onOpenReportModal}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                    title="Generate printable UK Regulatory Compliance Dossier"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Audit Dossier</span>
+                  </button>
+                )}
+              </div>
 
               {!readOnly && (
                 <div className="flex gap-2">
@@ -199,7 +221,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                     id="btn-save-snapshot"
                     onClick={handleSaveSnapshot}
                     disabled={isSavingSnapshot}
-                    className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                    className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-primary-700 hover:bg-primary-600 disabled:opacity-50 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
                     title="Save current state to persistent audit history"
                   >
                     <Save className="w-3.5 h-3.5" />
@@ -210,10 +232,10 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                     type="button"
                     id="btn-open-reminders"
                     onClick={() => setIsRemindersModalOpen(true)}
-                    className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm"
+                    className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-tertiary-800 hover:bg-tertiary-700 border border-tertiary-700 text-slate-200 text-xs font-semibold rounded-lg transition-colors shadow-sm"
                     title="Dispatch reminder emails for expiring certs"
                   >
-                    <Mail className="w-3.5 h-3.5" />
+                    <Mail className="w-3.5 h-3.5 text-secondary-400" />
                     <span>Reminders</span>
                   </button>
                 </div>
@@ -223,22 +245,22 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
         </div>
 
         {/* 3 Metric Scorecards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-5 border-t border-slate-800/80">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 pt-5 border-t border-tertiary-800/80">
           {/* Card 1: Employee Training */}
-          <div className="bg-slate-950/70 rounded-xl p-4 border border-slate-800 flex flex-col justify-between">
+          <div className="bg-tertiary-950/70 rounded-xl p-4 border border-tertiary-800 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-slate-300 font-semibold text-xs uppercase tracking-wide">
-                  <GraduationCap className="h-4 w-4 text-blue-400" />
+                  <GraduationCap className="h-4 w-4 text-primary-400" />
                   <span>Workforce Training (45%)</span>
                 </div>
                 <span className="text-sm font-bold text-white">
                   {report.trainingScorePercent}%
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full mt-2.5 overflow-hidden">
+              <div className="w-full bg-tertiary-800 h-2 rounded-full mt-2.5 overflow-hidden">
                 <div
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-primary-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${report.trainingScorePercent}%` }}
                 />
               </div>
@@ -256,7 +278,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             </div>
             <button
               onClick={() => onNavigateToTab('learners')}
-              className="text-xs font-semibold text-blue-400 hover:text-blue-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-slate-800"
+              className="text-xs font-semibold text-primary-400 hover:text-primary-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-tertiary-800"
             >
               <span>Manage learner register</span>
               <ArrowRight className="h-3 w-3" />
@@ -264,7 +286,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
           </div>
 
           {/* Card 2: Operational Checklists */}
-          <div className="bg-slate-950/70 rounded-xl p-4 border border-slate-800 flex flex-col justify-between">
+          <div className="bg-tertiary-950/70 rounded-xl p-4 border border-tertiary-800 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-slate-300 font-semibold text-xs uppercase tracking-wide">
@@ -275,7 +297,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                   {report.operationalChecklistScorePercent}%
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full mt-2.5 overflow-hidden">
+              <div className="w-full bg-tertiary-800 h-2 rounded-full mt-2.5 overflow-hidden">
                 <div
                   className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${report.operationalChecklistScorePercent}%` }}
@@ -287,7 +309,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             </div>
             <button
               onClick={() => onNavigateToTab('checklists')}
-              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-slate-800"
+              className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-tertiary-800"
             >
               <span>Complete audit forms & evidence</span>
               <ArrowRight className="h-3 w-3" />
@@ -295,21 +317,21 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
           </div>
 
           {/* Card 3: Right to Work & Governance */}
-          <div className="bg-slate-950/70 rounded-xl p-4 border border-slate-800 flex flex-col justify-between">
+          <div className="bg-tertiary-950/70 rounded-xl p-4 border border-tertiary-800 flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2 text-slate-300 font-semibold text-xs uppercase tracking-wide">
-                  <Scale className="h-4 w-4 text-amber-400" />
+                  <Scale className="h-4 w-4 text-secondary-400" />
                   <span>Right to Work Verification (15%)</span>
                 </div>
                 <span className="text-sm font-bold text-white">
                   {report.rightToWorkScorePercent}%
                 </span>
               </div>
-              <div className="w-full bg-slate-800 h-2 rounded-full mt-2.5 overflow-hidden">
+              <div className="w-full bg-tertiary-800 h-2 rounded-full mt-2.5 overflow-hidden">
                 <div
                   className={`h-2 rounded-full transition-all duration-500 ${
-                    report.rightToWorkScorePercent === 100 ? 'bg-amber-400' : 'bg-rose-500'
+                    report.rightToWorkScorePercent === 100 ? 'bg-secondary-400' : 'bg-rose-500'
                   }`}
                   style={{ width: `${report.rightToWorkScorePercent}%` }}
                 />
@@ -321,7 +343,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             </div>
             <button
               onClick={() => onNavigateToTab('learners')}
-              className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-slate-800"
+              className="text-xs font-semibold text-secondary-400 hover:text-secondary-300 flex items-center space-x-1 mt-3 pt-2.5 border-t border-tertiary-800"
             >
               <span>Verify employee credentials</span>
               <ArrowRight className="h-3 w-3" />
@@ -332,10 +354,10 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
 
       {/* PRIORITY ACTIONS: What To Do Next (Ranked by Fine Severity) */}
       {report.priorityActionItems && report.priorityActionItems.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-800 gap-2">
+        <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-tertiary-800 gap-2">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+              <div className="w-8 h-8 rounded-lg bg-secondary-500/20 border border-secondary-500/40 flex items-center justify-center text-secondary-400">
                 <Flame className="w-5 h-5" />
               </div>
               <div>
@@ -347,12 +369,12 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                 </p>
               </div>
             </div>
-            <span className="text-xs bg-amber-950 text-amber-300 font-bold px-2.5 py-1 rounded-full border border-amber-800/80 self-start sm:self-auto">
+            <span className="text-xs bg-secondary-900/80 text-secondary-300 font-bold px-2.5 py-1 rounded-full border border-secondary-700/80 self-start sm:self-auto">
               {(report?.priorityActionItems || []).length} Urgent Actions
             </span>
           </div>
 
-          <div className="divide-y divide-slate-800 mt-2">
+          <div className="divide-y divide-tertiary-800 mt-2">
             {(report?.priorityActionItems || []).map((item) => (
               <div key={item.id} className="py-3.5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1 flex-1">
@@ -362,8 +384,8 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                         item.severityLevel === 'critical'
                           ? 'bg-rose-950 text-rose-300 border border-rose-800'
                           : item.severityLevel === 'high'
-                          ? 'bg-amber-950 text-amber-300 border border-amber-800'
-                          : 'bg-blue-950 text-blue-300 border border-blue-800'
+                          ? 'bg-secondary-900/80 text-secondary-300 border border-secondary-700'
+                          : 'bg-primary-950 text-primary-300 border border-primary-800'
                       }`}
                     >
                       {item.severityLevel} Priority
@@ -391,7 +413,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                   {item.actionType === 'renew_training' && (
                     <button
                       onClick={() => onNavigateToTab('learners')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold rounded-lg transition-colors shadow-sm"
                     >
                       <span>Enrol Refresher</span>
                       <ArrowRight className="w-3 h-3" />
@@ -415,11 +437,11 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
 
       {/* Sector-Specific Official Rating Breakdown */}
       {profile.sector === 'food_hospitality' && report.foodHygieneBreakdown && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
-          <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-4">
+        <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-tertiary-800 gap-4">
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs bg-amber-950 text-amber-300 font-bold px-2.5 py-0.5 rounded border border-amber-800">
+                <span className="text-xs bg-secondary-900/80 text-secondary-300 font-bold px-2.5 py-0.5 rounded border border-secondary-700">
                   FSA Food Hygiene Rating Scheme (FHRS)
                 </span>
                 <span className="text-xs text-slate-400">Official Brand Standard Scoring</span>
@@ -430,7 +452,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             </div>
 
             {/* Official 0-5 Star Badge */}
-            <div className="flex items-center space-x-3 bg-slate-950 text-white px-4 py-2.5 rounded-xl border border-slate-800">
+            <div className="flex items-center space-x-3 bg-tertiary-950 text-white px-4 py-2.5 rounded-xl border border-tertiary-800">
               <div className="text-right">
                 <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
                   Projected Rating
@@ -439,7 +461,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                   {report.foodHygieneBreakdown.descriptor}
                 </div>
               </div>
-              <div className="h-10 w-10 bg-emerald-500 text-slate-950 font-black text-2xl flex items-center justify-center rounded-lg shadow">
+              <div className="h-10 w-10 bg-emerald-500 text-tertiary-950 font-black text-2xl flex items-center justify-center rounded-lg shadow">
                 {report.foodHygieneBreakdown.officialRating}
               </div>
             </div>
@@ -447,7 +469,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
 
           {/* 3 Scored Elements Table */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div className="border border-slate-800 rounded-xl p-3.5 bg-slate-950/60">
+            <div className="border border-tertiary-800 rounded-xl p-3.5 bg-tertiary-950/60">
               <div className="text-xs text-slate-400 font-medium">Element 1</div>
               <div className="text-sm font-semibold text-white mt-0.5">
                 Food Hygiene & Safety Procedures
@@ -461,7 +483,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
               </p>
             </div>
 
-            <div className="border border-slate-800 rounded-xl p-3.5 bg-slate-950/60">
+            <div className="border border-tertiary-800 rounded-xl p-3.5 bg-tertiary-950/60">
               <div className="text-xs text-slate-400 font-medium">Element 2</div>
               <div className="text-sm font-semibold text-white mt-0.5">
                 Structural Compliance
@@ -475,7 +497,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
               </p>
             </div>
 
-            <div className="border border-slate-800 rounded-xl p-3.5 bg-slate-950/60">
+            <div className="border border-tertiary-800 rounded-xl p-3.5 bg-tertiary-950/60">
               <div className="text-xs text-slate-400 font-medium">Element 3</div>
               <div className="text-sm font-semibold text-white mt-0.5">
                 Confidence in Management
@@ -492,8 +514,8 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
 
           {/* Additional scoring factor notice */}
           {report.foodHygieneBreakdown.cappedByElement && (
-            <div className="mt-3.5 bg-amber-950/40 border border-amber-800/80 rounded-xl p-3 text-xs text-amber-200 flex items-start space-x-2">
-              <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+            <div className="mt-3.5 bg-secondary-900/40 border border-secondary-700/80 rounded-xl p-3 text-xs text-secondary-200 flex items-start space-x-2">
+              <AlertTriangle className="h-4 w-4 text-secondary-400 shrink-0 mt-0.5" />
               <div>
                 <strong className="font-semibold">FSA Limiting Factor Capping Rule Triggered:</strong>{' '}
                 {report.foodHygieneBreakdown.limitingFactor} Under FSA statutory guidelines, the worst single element score places an absolute ceiling on the final star rating.
@@ -518,7 +540,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             {(report?.statutoryPenaltiesRisk || []).map((item, idx) => (
               <div
                 key={idx}
-                className="bg-slate-900 border border-rose-900/50 rounded-xl p-3.5 flex flex-col justify-between text-xs"
+                className="bg-tertiary-900 border border-rose-900/50 rounded-xl p-3.5 flex flex-col justify-between text-xs"
               >
                 <div>
                   <div className="flex items-center justify-between">
@@ -533,14 +555,14 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                     {item.riskDescription}
                   </p>
                 </div>
-                <div className="text-[11px] text-slate-500 font-medium mt-2 pt-1.5 border-t border-slate-800 flex items-center justify-between">
+                <div className="text-[11px] text-slate-500 font-medium mt-2 pt-1.5 border-t border-tertiary-800 flex items-center justify-between">
                   <span>Basis: {item.regulation}</span>
                   {item.sourceUrl && (
                     <a
                       href={item.sourceUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sky-400 hover:underline inline-flex items-center gap-1"
+                      className="text-primary-400 hover:underline inline-flex items-center gap-1"
                     >
                       <span>gov.uk</span>
                       <ExternalLink className="w-3 h-3" />
@@ -556,11 +578,11 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
       {/* Actionable Gap Remediation Split: Training Solutions vs Operational Checklists */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Solution Pillar 1: Employee Training Gaps (Our Solutions!) */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-tertiary-800">
               <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-lg bg-blue-950 border border-blue-800 flex items-center justify-center text-blue-400">
+                <div className="h-8 w-8 rounded-lg bg-primary-950 border border-primary-800 flex items-center justify-center text-primary-400">
                   <GraduationCap className="h-5 w-5" />
                 </div>
                 <div>
@@ -572,7 +594,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                   </p>
                 </div>
               </div>
-              <span className="text-xs bg-blue-950 text-blue-300 font-bold px-2 py-1 rounded-md border border-blue-800">
+              <span className="text-xs bg-primary-950 text-primary-300 font-bold px-2 py-1 rounded-md border border-primary-800">
                 {aggregatedTrainingSolutions.length} Course Needs
               </span>
             </div>
@@ -583,7 +605,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                 All learners have completed or are actively enrolled in their mandatory courses!
               </div>
             ) : (
-              <div className="divide-y divide-slate-800 mt-3 max-h-[380px] overflow-y-auto pr-1">
+              <div className="divide-y divide-tertiary-800 mt-3 max-h-[380px] overflow-y-auto pr-1">
                 {aggregatedTrainingSolutions.map(({ course, count }) => (
                   <div key={course.id} className="py-3 flex items-start justify-between gap-3 text-xs">
                     <div className="space-y-1">
@@ -591,14 +613,14 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                         <span className="font-bold text-white">
                           {course.title}
                         </span>
-                        <span className="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-medium">
+                        <span className="text-[10px] bg-tertiary-800 text-slate-300 px-1.5 py-0.5 rounded font-medium">
                           {course.accreditation}
                         </span>
                       </div>
                       <p className="text-slate-400 leading-snug">
                         {course.description}
                       </p>
-                      <div className="text-[11px] text-blue-400 font-semibold flex items-center space-x-2">
+                      <div className="text-[11px] text-primary-400 font-semibold flex items-center space-x-2">
                         <span>
                           {count} learner{count > 1 ? 's' : ''} require this course
                         </span>
@@ -610,7 +632,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                     {!readOnly && (
                       <button
                         onClick={() => onQuickEnrolLearners(course.id)}
-                        className="shrink-0 text-xs bg-blue-600 hover:bg-blue-500 text-white font-semibold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm"
+                        className="shrink-0 text-xs bg-primary-600 hover:bg-primary-500 text-white font-semibold px-2.5 py-1.5 rounded-lg transition-colors shadow-sm"
                       >
                         Enrol {count} Staff
                       </button>
@@ -621,13 +643,13 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             )}
           </div>
 
-          <div className="pt-4 border-t border-slate-800 mt-4 flex items-center justify-between">
+          <div className="pt-4 border-t border-tertiary-800 mt-4 flex items-center justify-between">
             <span className="text-xs text-slate-400">
               LMS courses sync progress automatically with this dashboard.
             </span>
             <button
               onClick={() => onNavigateToTab('solutions')}
-              className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+              className="text-xs font-bold text-primary-400 hover:text-primary-300 flex items-center space-x-1"
             >
               <span>Explore full course catalog</span>
               <ArrowRight className="h-3.5 w-3.5" />
@@ -636,9 +658,9 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
         </div>
 
         {/* Solution Pillar 2: Operational & Manager Audit Prep */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-tertiary-800">
               <div className="flex items-center space-x-2">
                 <div className="h-8 w-8 rounded-lg bg-emerald-950 border border-emerald-800 flex items-center justify-center text-emerald-400">
                   <ClipboardCheck className="h-5 w-5" />
@@ -657,7 +679,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
               </span>
             </div>
 
-            <div className="divide-y divide-slate-800 mt-3 max-h-[380px] overflow-y-auto pr-1">
+            <div className="divide-y divide-tertiary-800 mt-3 max-h-[380px] overflow-y-auto pr-1">
               {(report?.criticalOperationalGaps || []).length === 0 &&
               (report?.inProgressOperationalItems || []).length === 0 ? (
                 <div className="py-8 text-center text-slate-400 text-xs">
@@ -690,11 +712,11 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
                   {(report?.inProgressOperationalItems || []).map((item) => (
                     <div key={item.id} className="py-3 space-y-1 text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-amber-300 flex items-center space-x-1.5">
-                          <Clock className="h-3.5 w-3.5 text-amber-400" />
+                        <span className="font-bold text-secondary-300 flex items-center space-x-1.5">
+                          <Clock className="h-3.5 w-3.5 text-secondary-400" />
                           <span>{item.title}</span>
                         </span>
-                        <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 font-semibold px-2 py-0.5 rounded">
+                        <span className="text-[10px] bg-secondary-900/80 text-secondary-300 border border-secondary-700 font-semibold px-2 py-0.5 rounded">
                           {item.evidenceDocumented ? 'In Progress' : 'Needs Evidence Attachment'}
                         </span>
                       </div>
@@ -712,7 +734,7 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-800 mt-4 flex items-center justify-between">
+          <div className="pt-4 border-t border-tertiary-800 mt-4 flex items-center justify-between">
             <span className="text-xs text-slate-400">
               Managers can update status and attach evidence anytime.
             </span>
@@ -728,16 +750,16 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
       </div>
 
       {/* Historical Audit Snapshots Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm">
+        <div className="flex items-center justify-between pb-3 border-b border-tertiary-800">
           <div className="flex items-center space-x-2">
-            <History className="w-5 h-5 text-sky-400" />
+            <History className="w-5 h-5 text-primary-400" />
             <h2 className="text-base font-bold text-white">Historical Audit Snapshots ({(snapshots || []).length})</h2>
           </div>
           <button
             type="button"
             onClick={() => setShowSnapshotHistory(!showSnapshotHistory)}
-            className="text-xs text-sky-400 hover:underline font-semibold"
+            className="text-xs text-primary-400 hover:underline font-semibold"
           >
             {showSnapshotHistory ? 'Hide Snapshot History' : 'Show Snapshot History'}
           </button>
@@ -752,23 +774,36 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {(snapshots || []).map((s) => (
-                  <div key={s.id} className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-xs space-y-1.5">
-                    <div className="flex justify-between items-start">
-                      <span className="font-bold text-white">{s.inspectorRef || 'Audit Snapshot'}</span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
-                        {s.overallScorePercent}%
-                      </span>
+                  <div key={s.id} className="p-3.5 bg-tertiary-950 border border-tertiary-800 rounded-xl text-xs space-y-2 flex flex-col justify-between hover:border-tertiary-700 transition-colors">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <span className="font-bold text-white">{s.inspectorRef || 'Audit Snapshot'}</span>
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                          {s.overallScorePercent}%
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-[11px] font-mono mt-0.5">
+                        {new Date(s.timestamp).toLocaleString()}
+                      </p>
+                      <p className="text-slate-300 text-[11px] leading-relaxed mt-1 line-clamp-2">
+                        {s.notes || s.summary}
+                      </p>
                     </div>
-                    <p className="text-slate-400 text-[11px] font-mono">
-                      {new Date(s.timestamp).toLocaleString()}
-                    </p>
-                    <p className="text-slate-300 text-[11px] leading-relaxed line-clamp-2">
-                      {s.notes || s.summary}
-                    </p>
-                    <div className="pt-2 border-t border-slate-800 flex justify-between text-[10px] text-slate-400">
-                      <span>Training: {s.trainingScorePercent}%</span>
-                      <span>Checklists: {s.operationalChecklistScorePercent}%</span>
-                      <span>RTW: {s.rightToWorkScorePercent}%</span>
+
+                    <div>
+                      <div className="pt-2 border-t border-tertiary-800 flex justify-between text-[10px] text-slate-400">
+                        <span>Training: {s.trainingScorePercent}%</span>
+                        <span>Checklists: {s.operationalChecklistScorePercent}%</span>
+                        <span>RTW: {s.rightToWorkScorePercent}%</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedSnapshotForView(s)}
+                        className="w-full mt-2 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 bg-tertiary-900 hover:bg-tertiary-800 text-primary-300 text-[11px] font-semibold rounded-lg border border-tertiary-800 transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Inspect Frozen Snapshot</span>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -777,6 +812,97 @@ export const AuditOverview: React.FC<AuditOverviewProps> = ({
           </div>
         )}
       </div>
+
+      {/* Frozen Snapshot Inspector Modal */}
+      {selectedSnapshotForView && (
+        <div className="fixed inset-0 bg-tertiary-950/80 backdrop-blur-xs flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col text-slate-100">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-tertiary-800 bg-tertiary-950 rounded-t-2xl">
+              <div className="flex items-center space-x-2">
+                <History className="h-5 w-5 text-primary-400" />
+                <div>
+                  <h3 className="text-sm font-bold text-white">
+                    Frozen Audit Snapshot • {selectedSnapshotForView.inspectorRef}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 font-mono">
+                    Recorded {new Date(selectedSnapshotForView.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedSnapshotForView(null)}
+                className="text-slate-400 hover:text-white rounded-lg p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto space-y-4 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3 text-center">
+                  <div className="text-slate-400 text-[11px]">Overall Score</div>
+                  <div className="text-2xl font-black text-white mt-0.5">
+                    {selectedSnapshotForView.overallScorePercent}%
+                  </div>
+                  <div className="text-[10px] text-emerald-400 mt-0.5 font-bold">
+                    {selectedSnapshotForView.gradeBadge}
+                  </div>
+                </div>
+                <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3 text-center">
+                  <div className="text-slate-400 text-[11px]">Training Score</div>
+                  <div className="text-xl font-black text-primary-400 mt-0.5">
+                    {selectedSnapshotForView.trainingScorePercent}%
+                  </div>
+                </div>
+                <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3 text-center">
+                  <div className="text-slate-400 text-[11px]">Checklists</div>
+                  <div className="text-xl font-black text-emerald-400 mt-0.5">
+                    {selectedSnapshotForView.operationalChecklistScorePercent}%
+                  </div>
+                </div>
+                <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3 text-center">
+                  <div className="text-slate-400 text-[11px]">Right To Work</div>
+                  <div className="text-xl font-black text-secondary-400 mt-0.5">
+                    {selectedSnapshotForView.rightToWorkScorePercent}%
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-tertiary-950 rounded-xl p-4 border border-tertiary-800 space-y-2">
+                <div className="font-bold text-slate-200">Audit Summary & Notes</div>
+                <p className="text-slate-300 leading-relaxed">
+                  {selectedSnapshotForView.notes || selectedSnapshotForView.summary}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-tertiary-800 text-[11px] text-slate-400">
+                  <div>Employees: <strong className="text-white">{selectedSnapshotForView.totalEmployees}</strong></div>
+                  <div>Learners: <strong className="text-white">{selectedSnapshotForView.totalLearners}</strong></div>
+                  <div>Critical Gaps: <strong className="text-rose-400">{selectedSnapshotForView.criticalGapsCount}</strong></div>
+                  <div>Expired Certs: <strong className="text-rose-400">{selectedSnapshotForView.expiredCertsCount}</strong></div>
+                </div>
+              </div>
+
+              <div className="p-3 bg-primary-950/40 border border-primary-800/60 rounded-xl text-slate-300">
+                <div className="text-[11px] font-bold text-primary-300 mb-1">
+                  Immutable Statutory Audit Trail
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  This snapshot was persisted to the compliance database and linked permanently to business ID <code className="text-white font-mono">{selectedSnapshotForView.businessId}</code>. It represents statutory records verified at the timestamp indicated.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end items-center px-6 py-3 border-t border-tertiary-800 bg-tertiary-950 rounded-b-2xl">
+              <button
+                type="button"
+                onClick={() => setSelectedSnapshotForView(null)}
+                className="px-4 py-1.5 bg-tertiary-800 hover:bg-tertiary-700 text-white rounded-lg text-xs font-semibold transition-colors"
+              >
+                Close Inspector
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <ExplainScoreModal

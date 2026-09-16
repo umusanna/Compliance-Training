@@ -145,6 +145,19 @@ export const api = {
     return res.json();
   },
 
+  async createChecklistItem(
+    businessId: string,
+    item: Partial<AuditChecklistItem>
+  ): Promise<{ success: boolean; id: string }> {
+    const res = await fetch(`/api/business/${businessId}/checklists`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item),
+    });
+    if (!res.ok) throw new Error('Failed to create checklist item');
+    return res.json();
+  },
+
   async updateChecklist(
     businessId: string,
     checklistId: string,

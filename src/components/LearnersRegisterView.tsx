@@ -155,10 +155,10 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-lg">
+            <div className="h-10 w-10 rounded-xl bg-primary-600/20 border border-primary-500/40 text-primary-300 flex items-center justify-center font-bold text-lg">
               3
             </div>
             <div>
@@ -177,9 +177,9 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
                 type="button"
                 id="btn-bulk-csv-import"
                 onClick={() => setIsCsvModalOpen(true)}
-                className="inline-flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl border border-slate-700 transition-colors shadow-sm"
+                className="inline-flex items-center space-x-1.5 bg-tertiary-800 hover:bg-tertiary-700 text-slate-200 text-xs font-semibold px-3 py-2 rounded-xl border border-tertiary-700 transition-colors shadow-sm"
               >
-                <Upload className="h-3.5 w-3.5 text-emerald-400" />
+                <Upload className="h-3.5 w-3.5 text-primary-400" />
                 <span>Bulk CSV Import</span>
               </button>
 
@@ -187,7 +187,7 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
                 type="button"
                 id="register-new-learner-btn"
                 onClick={onOpenAddModal}
-                className="inline-flex items-center space-x-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors shadow-sm"
+                className="inline-flex items-center space-x-1.5 bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors shadow-sm"
               >
                 <Plus className="h-4 w-4" />
                 <span>Register New Learner</span>
@@ -197,14 +197,14 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
         </div>
 
         {/* View Tabs: Active vs Archived */}
-        <div className="mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs flex-wrap gap-3">
-          <div className="flex space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+        <div className="mt-5 pt-4 border-t border-tertiary-800 flex items-center justify-between text-xs flex-wrap gap-3">
+          <div className="flex space-x-2 bg-tertiary-950 p-1 rounded-xl border border-tertiary-800">
             <button
               type="button"
               onClick={() => setViewTab('active')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-colors ${
                 viewTab === 'active'
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-primary-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -215,7 +215,7 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
               onClick={() => setViewTab('archived')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-colors ${
                 viewTab === 'archived'
-                  ? 'bg-amber-600 text-white shadow-sm'
+                  ? 'bg-secondary-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -236,7 +236,7 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
       </div>
 
       {/* Filter and Search controls */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
         <div className="relative w-full md:w-72">
           <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
           <input
@@ -245,12 +245,12 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
             placeholder="Search by learner name, job, department..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+            className="w-full bg-tertiary-950 border border-tertiary-800 rounded-xl pl-8 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-primary-500"
           />
         </div>
 
         <div className="flex items-center space-x-2 w-full md:w-auto justify-end flex-wrap gap-y-2">
-          <div className="flex items-center space-x-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1">
+          <div className="flex items-center space-x-1 bg-tertiary-950 border border-tertiary-800 rounded-xl px-2.5 py-1">
             <Filter className="h-3 w-3 text-slate-400" />
             <span className="text-slate-500 text-[11px]">Role Level:</span>
             <select
@@ -259,15 +259,15 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
               onChange={(e) => setRoleFilter(e.target.value)}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
             >
-              <option value="all" className="bg-slate-900">All Roles</option>
-              <option value="manager" className="bg-slate-900">Managers</option>
-              <option value="supervisor" className="bg-slate-900">Supervisors</option>
-              <option value="field_worker" className="bg-slate-900">Field / Frontline</option>
-              <option value="admin" className="bg-slate-900">Admin Support</option>
+              <option value="all" className="bg-tertiary-900">All Roles</option>
+              <option value="manager" className="bg-tertiary-900">Managers</option>
+              <option value="supervisor" className="bg-tertiary-900">Supervisors</option>
+              <option value="field_worker" className="bg-tertiary-900">Field / Frontline</option>
+              <option value="admin" className="bg-tertiary-900">Admin Support</option>
             </select>
           </div>
 
-          <div className="flex items-center space-x-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1">
+          <div className="flex items-center space-x-1 bg-tertiary-950 border border-tertiary-800 rounded-xl px-2.5 py-1">
             <span className="text-slate-500 text-[11px]">Compliance:</span>
             <select
               id="filter-compliance"
@@ -275,9 +275,9 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
               onChange={(e) => setComplianceFilter(e.target.value)}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
             >
-              <option value="all" className="bg-slate-900">All Statuses</option>
-              <option value="compliant" className="bg-slate-900">Fully Compliant</option>
-              <option value="gaps" className="bg-slate-900">Training Gaps Present</option>
+              <option value="all" className="bg-tertiary-900">All Statuses</option>
+              <option value="compliant" className="bg-tertiary-900">Fully Compliant</option>
+              <option value="gaps" className="bg-tertiary-900">Training Gaps Present</option>
             </select>
           </div>
         </div>
@@ -303,12 +303,12 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
             return (
               <div
                 key={learner.id}
-                className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 hover:border-slate-700 transition-colors"
+                className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 shadow-sm space-y-4 hover:border-tertiary-700 transition-colors"
               >
                 {/* Learner Top Info Row */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-tertiary-800">
                   <div className="flex items-start space-x-3">
-                    <div className="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-white text-sm shrink-0">
+                    <div className="h-10 w-10 rounded-xl bg-tertiary-800 border border-tertiary-700 flex items-center justify-center font-bold text-white text-sm shrink-0">
                       {learner.name
                         .split(' ')
                         .map((n) => n[0])
@@ -319,13 +319,13 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
                     <div>
                       <div className="flex items-center space-x-2 flex-wrap">
                         <span className="font-bold text-sm text-white">{learner.name}</span>
-                        <span className="text-[11px] bg-slate-800 text-slate-300 font-semibold px-2 py-0.5 rounded capitalize">
+                        <span className="text-[11px] bg-tertiary-800 text-slate-300 font-semibold px-2 py-0.5 rounded capitalize">
                           {learner.roleLevel.replace('_', ' ')}
                         </span>
                         <span className="text-xs text-slate-500">•</span>
                         <span className="text-xs text-slate-300">{learner.jobTitle}</span>
                         {learner.isArchived && (
-                          <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 font-bold px-2 py-0.5 rounded">
+                          <span className="text-[10px] bg-secondary-900/80 text-secondary-300 border border-secondary-700 font-bold px-2 py-0.5 rounded">
                             Archived: {learner.archivedReason}
                           </span>
                         )}
@@ -499,7 +499,7 @@ export const LearnersRegisterView: React.FC<LearnersRegisterViewProps> = ({
                                     </span>
                                   )}
                                   {isExpiringSoon && (
-                                    <span className="text-[10px] bg-amber-950 text-amber-300 border border-amber-800 font-bold px-1.5 py-0.5 rounded">
+                                    <span className="text-[10px] bg-secondary-900/80 text-secondary-300 border border-secondary-700 font-bold px-1.5 py-0.5 rounded">
                                       Expires in &lt;30d
                                     </span>
                                   )}

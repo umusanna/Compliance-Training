@@ -74,9 +74,9 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Step Header */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="h-10 w-10 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center font-bold text-lg">
+          <div className="h-10 w-10 rounded-xl bg-primary-600/20 border border-primary-500/40 text-primary-400 flex items-center justify-center font-bold text-lg">
             1
           </div>
           <div>
@@ -94,9 +94,9 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
         {/* Left 2 Cols: Business Entity & Sector Details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Entity Details Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+          <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-              <Building2 className="h-4 w-4 text-emerald-400" />
+              <Building2 className="h-4 w-4 text-primary-400" />
               <span>Company Entity Details</span>
             </h3>
 
@@ -111,7 +111,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile.name}
                   onChange={(e) => onUpdateProfile({ name: e.target.value })}
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
 
@@ -126,7 +126,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   value={profile.tradingName || ''}
                   onChange={(e) => onUpdateProfile({ tradingName: e.target.value })}
                   placeholder="e.g. Crown & Anchor Pub"
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
 
@@ -141,7 +141,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   value={profile.companyNumber}
                   onChange={(e) => onUpdateProfile({ companyNumber: e.target.value })}
                   placeholder="8-digit CRN (e.g. 09845120)"
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500 font-mono"
                 />
               </div>
 
@@ -154,11 +154,11 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   value={profile.jurisdiction}
                   disabled={readOnly}
                   onChange={(e) => onUpdateProfile({ jurisdiction: e.target.value as Jurisdiction })}
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500"
                 >
-                  <option value="england_wales" className="bg-slate-900">England & Wales (FSA 0-5 FHRS, CQC, HSE)</option>
-                  <option value="scotland" className="bg-slate-900">Scotland (Food Hygiene FHIS Pass/Fail)</option>
-                  <option value="northern_ireland" className="bg-slate-900">Northern Ireland (Mandatory FHRS display)</option>
+                  <option value="england_wales" className="bg-tertiary-900">England & Wales (FSA 0-5 FHRS, CQC, HSE)</option>
+                  <option value="scotland" className="bg-tertiary-900">Scotland (Food Hygiene FHIS Pass/Fail)</option>
+                  <option value="northern_ireland" className="bg-tertiary-900">Northern Ireland (Mandatory FHRS display)</option>
                 </select>
               </div>
 
@@ -171,10 +171,10 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   value={profile.sector}
                   disabled={readOnly}
                   onChange={(e) => onUpdateProfile({ sector: e.target.value as SectorId })}
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-emerald-500"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white font-semibold focus:outline-none focus:border-primary-500"
                 >
                   {Object.entries(SECTOR_METADATA).map(([key, meta]) => (
-                    <option key={key} value={key} className="bg-slate-900">
+                    <option key={key} value={key} className="bg-tertiary-900">
                       {meta.name} ({meta.regulator.split('(')[0].trim()})
                     </option>
                   ))}
@@ -192,25 +192,25 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   value={profile.subSector}
                   onChange={(e) => onUpdateProfile({ subSector: e.target.value })}
                   placeholder="e.g. Care Home, Domiciliary, Gastropub, Fintech"
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
             </div>
 
             {/* Sector Specific Declarations */}
-            <div className="pt-4 border-t border-slate-800">
+            <div className="pt-4 border-t border-tertiary-800">
               <h4 className="text-xs font-bold text-slate-300 mb-2">
                 Sector Regulatory Registrations
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {profile.sector === 'food_hospitality' && (
-                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer">
+                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-tertiary-800 bg-tertiary-950 cursor-pointer">
                     <input
                       type="checkbox"
                       disabled={readOnly}
                       checked={profile.fsaRegistered ?? true}
                       onChange={(e) => onUpdateProfile({ fsaRegistered: e.target.checked })}
-                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500"
+                      className="rounded border-tertiary-700 bg-tertiary-900 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-slate-200 font-medium">
                       Registered with Local Authority EHO (&gt;28 days notice)
@@ -219,13 +219,13 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                 )}
 
                 {profile.sector === 'health_social_care' && (
-                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer">
+                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-tertiary-800 bg-tertiary-950 cursor-pointer">
                     <input
                       type="checkbox"
                       disabled={readOnly}
                       checked={profile.cqcRegistered ?? true}
                       onChange={(e) => onUpdateProfile({ cqcRegistered: e.target.checked })}
-                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500"
+                      className="rounded border-tertiary-700 bg-tertiary-900 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-slate-200 font-medium">
                       Active CQC Provider Registration & Registered Manager
@@ -234,13 +234,13 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                 )}
 
                 {profile.sector === 'financial_services' && (
-                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer">
+                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-tertiary-800 bg-tertiary-950 cursor-pointer">
                     <input
                       type="checkbox"
                       disabled={readOnly}
                       checked={profile.fcaAuthorised ?? true}
                       onChange={(e) => onUpdateProfile({ fcaAuthorised: e.target.checked })}
-                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500"
+                      className="rounded border-tertiary-700 bg-tertiary-900 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-slate-200 font-medium">
                       FCA Authorised / Registered on Financial Services Register
@@ -249,13 +249,13 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                 )}
 
                 {profile.sector === 'construction' && (
-                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer">
+                  <label className="flex items-center space-x-2 p-3 rounded-xl border border-tertiary-800 bg-tertiary-950 cursor-pointer">
                     <input
                       type="checkbox"
                       disabled={readOnly}
                       checked={profile.cdmNotifiable ?? true}
                       onChange={(e) => onUpdateProfile({ cdmNotifiable: e.target.checked })}
-                      className="rounded border-slate-700 bg-slate-900 text-emerald-500 focus:ring-emerald-500"
+                      className="rounded border-tertiary-700 bg-tertiary-900 text-primary-500 focus:ring-primary-500"
                     />
                     <span className="text-slate-200 font-medium">
                       CDM 2015 Notifiable Project (&gt;30 days/20 workers or 500 person-days)
@@ -267,11 +267,11 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
           </div>
 
           {/* Workforce Role Levels & Headcount */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
+          <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                  <Users className="h-4 w-4 text-emerald-400" />
+                  <Users className="h-4 w-4 text-primary-400" />
                   <span>Workforce Role Level Breakdown</span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -286,7 +286,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               {/* Managers */}
-              <div className="border border-slate-800 rounded-xl p-3 bg-slate-950">
+              <div className="border border-tertiary-800 rounded-xl p-3 bg-tertiary-950">
                 <div className="text-xs font-semibold text-slate-200">Managers & Directors</div>
                 <div className="text-[11px] text-slate-400 mb-2">
                   Accountable leads, SMF holders, registered managers
@@ -298,12 +298,12 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile?.employeeCounts?.manager || 0}
                   onChange={(e) => handleRoleCountChange('manager', parseInt(e.target.value))}
-                  className="w-full text-sm font-bold bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-sm font-bold bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
 
               {/* Supervisors */}
-              <div className="border border-slate-800 rounded-xl p-3 bg-slate-950">
+              <div className="border border-tertiary-800 rounded-xl p-3 bg-tertiary-950">
                 <div className="text-xs font-semibold text-slate-200">Supervisors & Leads</div>
                 <div className="text-[11px] text-slate-400 mb-2">
                   Team leaders, sous chefs, site safety supervisors
@@ -315,12 +315,12 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile?.employeeCounts?.supervisor || 0}
                   onChange={(e) => handleRoleCountChange('supervisor', parseInt(e.target.value))}
-                  className="w-full text-sm font-bold bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-sm font-bold bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
 
               {/* Field Workers */}
-              <div className="border border-slate-800 rounded-xl p-3 bg-slate-950">
+              <div className="border border-tertiary-800 rounded-xl p-3 bg-tertiary-950">
                 <div className="text-xs font-semibold text-slate-200">Field & Frontline Staff</div>
                 <div className="text-[11px] text-slate-400 mb-2">
                   Kitchen cooks, care assistants, operatives, trades
@@ -332,12 +332,12 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile?.employeeCounts?.field_worker || 0}
                   onChange={(e) => handleRoleCountChange('field_worker', parseInt(e.target.value))}
-                  className="w-full text-sm font-bold bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-sm font-bold bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
 
               {/* Admin */}
-              <div className="border border-slate-800 rounded-xl p-3 bg-slate-950">
+              <div className="border border-tertiary-800 rounded-xl p-3 bg-tertiary-950">
                 <div className="text-xs font-semibold text-slate-200">Admin & Office Support</div>
                 <div className="text-[11px] text-slate-400 mb-2">
                   Payroll, HR, reception, administrative clerks
@@ -349,7 +349,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile?.employeeCounts?.admin || 0}
                   onChange={(e) => handleRoleCountChange('admin', parseInt(e.target.value))}
-                  className="w-full text-sm font-bold bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full text-sm font-bold bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1 text-white focus:outline-none focus:border-primary-500"
                 />
               </div>
             </div>
@@ -357,7 +357,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
             <div className="flex items-center justify-between text-xs text-slate-400 pt-2">
               <span>Currently registered in learner roster: <strong className="text-white">{registeredLearnerCount} learners</strong></span>
               {registeredLearnerCount < totalEmployees && (
-                <span className="text-amber-400 font-medium">
+                <span className="text-secondary-400 font-medium">
                   ⚠️ {totalEmployees - registeredLearnerCount} employees not yet added to learner register
                 </span>
               )}
@@ -367,15 +367,15 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
 
         {/* Right Col: Statutory Size Tier & Financial Thresholds */}
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+          <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-              <Scale className="h-4 w-4 text-emerald-400" />
+              <Scale className="h-4 w-4 text-secondary-400" />
               <span>Company Size & Filing Tier</span>
             </h3>
 
-            <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 space-y-2">
+            <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3.5 space-y-2">
               <div className="text-xs text-slate-400 font-medium">Statutory Classification:</div>
-              <div className="text-base font-bold text-emerald-400">{sizeTier}</div>
+              <div className="text-base font-bold text-secondary-400">{sizeTier}</div>
               <p className="text-xs text-slate-400 leading-snug">{sizeAuditStatus}</p>
             </div>
 
@@ -391,7 +391,7 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   disabled={readOnly}
                   value={profile.turnoverGbp}
                   onChange={(e) => onUpdateProfile({ turnoverGbp: parseInt(e.target.value) || 0 })}
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500 font-mono"
                 />
                 <span className="text-[10px] text-slate-500">Micro ≤ £1m | Small ≤ £15m | Med ≤ £54m</span>
               </div>
@@ -409,36 +409,36 @@ export const BusinessProfileView: React.FC<BusinessProfileViewProps> = ({
                   onChange={(e) =>
                     onUpdateProfile({ balanceSheetGbp: parseInt(e.target.value) || 0 })
                   }
-                  className="w-full text-xs bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-mono"
+                  className="w-full text-xs bg-tertiary-950 border border-tertiary-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary-500 font-mono"
                 />
                 <span className="text-[10px] text-slate-500">Micro ≤ £500k | Small ≤ £7.5m | Med ≤ £27m</span>
               </div>
             </div>
 
             {/* Applicable Regulators Summary */}
-            <div className="pt-3 border-t border-slate-800">
+            <div className="pt-3 border-t border-tertiary-800">
               <div className="text-xs font-bold text-white mb-2">
                 Enforcing Regulators for this Business:
               </div>
               <ul className="space-y-1.5 text-xs text-slate-400">
                 <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary-400 shrink-0" />
                   <span>{SECTOR_METADATA[profile.sector].regulator}</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary-400 shrink-0" />
                   <span>Home Office (Right to Work & Immigration)</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary-400 shrink-0" />
                   <span>Health and Safety Executive (HSE)</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary-400 shrink-0" />
                   <span>Information Commissioner's Office (ICO GDPR)</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-primary-400 shrink-0" />
                   <span>HMRC (PAYE, Corporation Tax, Minimum Wage)</span>
                 </li>
               </ul>

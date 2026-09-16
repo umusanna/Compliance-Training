@@ -150,10 +150,10 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header & Stats Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-5 md:p-6 shadow-sm text-slate-100">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center font-bold text-lg">
+            <div className="h-10 w-10 rounded-xl bg-primary-600/20 border border-primary-500/40 text-primary-400 flex items-center justify-center font-bold text-lg">
               2
             </div>
             <div>
@@ -171,7 +171,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
               type="button"
               id="add-custom-audit-item-btn"
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center space-x-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors shadow-sm shrink-0 self-start md:self-auto"
+              className="inline-flex items-center space-x-1.5 bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition-colors shadow-sm shrink-0 self-start md:self-auto"
             >
               <Plus className="h-4 w-4" />
               <span>Add Custom Checklist Item</span>
@@ -180,20 +180,20 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
         </div>
 
         {/* Status Counters */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-slate-800 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5 pt-4 border-t border-tertiary-800 text-xs">
           <div className="bg-emerald-950/40 border border-emerald-800/60 rounded-xl p-3 text-center">
             <div className="text-emerald-400 font-semibold">Compliant</div>
             <div className="text-xl font-black text-white mt-0.5">{compliantCount}</div>
           </div>
-          <div className="bg-blue-950/40 border border-blue-800/60 rounded-xl p-3 text-center">
-            <div className="text-blue-400 font-semibold">In Progress</div>
+          <div className="bg-primary-950/40 border border-primary-800/60 rounded-xl p-3 text-center">
+            <div className="text-primary-400 font-semibold">In Progress</div>
             <div className="text-xl font-black text-white mt-0.5">{inProgressCount}</div>
           </div>
           <div className="bg-rose-950/40 border border-rose-800/60 rounded-xl p-3 text-center">
             <div className="text-rose-400 font-semibold">Critical Gaps</div>
             <div className="text-xl font-black text-white mt-0.5">{criticalCount}</div>
           </div>
-          <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center">
+          <div className="bg-tertiary-950 border border-tertiary-800 rounded-xl p-3 text-center">
             <div className="text-slate-400 font-semibold">Not Started</div>
             <div className="text-xl font-black text-white mt-0.5">{notStartedCount}</div>
           </div>
@@ -201,7 +201,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+      <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
         <div className="flex items-center space-x-2 w-full md:w-auto">
           <div className="relative w-full md:w-64">
             <Search className="h-3.5 w-3.5 text-slate-400 absolute left-3 top-2.5" />
@@ -211,13 +211,13 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
               placeholder="Search checklist or regulation..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full bg-tertiary-950 border border-tertiary-800 rounded-xl pl-8 pr-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:border-primary-500"
             />
           </div>
         </div>
 
         <div className="flex items-center flex-wrap gap-2 w-full md:w-auto justify-end">
-          <div className="flex items-center space-x-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1">
+          <div className="flex items-center space-x-1 bg-tertiary-950 border border-tertiary-800 rounded-xl px-2.5 py-1">
             <Filter className="h-3 w-3 text-slate-400" />
             <span className="text-slate-500 text-[11px]">Category:</span>
             <select
@@ -226,16 +226,16 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
             >
-              <option value="all" className="bg-slate-900">All Categories</option>
-              <option value="sector_specific" className="bg-slate-900">Sector Regulated</option>
-              <option value="universal_employment" className="bg-slate-900">Right to Work & Wages</option>
-              <option value="universal_hse" className="bg-slate-900">HSE Workplace Safety</option>
-              <option value="universal_gdpr" className="bg-slate-900">Data Protection (ICO)</option>
-              <option value="universal_companies_house" className="bg-slate-900">Companies House & Tax</option>
+              <option value="all" className="bg-tertiary-900">All Categories</option>
+              <option value="sector_specific" className="bg-tertiary-900">Sector Regulated</option>
+              <option value="universal_employment" className="bg-tertiary-900">Right to Work & Wages</option>
+              <option value="universal_hse" className="bg-tertiary-900">HSE Workplace Safety</option>
+              <option value="universal_gdpr" className="bg-tertiary-900">Data Protection (ICO)</option>
+              <option value="universal_companies_house" className="bg-tertiary-900">Companies House & Tax</option>
             </select>
           </div>
 
-          <div className="flex items-center space-x-1 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1">
+          <div className="flex items-center space-x-1 bg-tertiary-950 border border-tertiary-800 rounded-xl px-2.5 py-1">
             <span className="text-slate-500 text-[11px]">Status:</span>
             <select
               id="filter-status"
@@ -243,11 +243,11 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="bg-transparent text-white font-medium focus:outline-none cursor-pointer text-xs"
             >
-              <option value="all" className="bg-slate-900">All Statuses</option>
-              <option value="compliant" className="bg-slate-900">Compliant</option>
-              <option value="in_progress" className="bg-slate-900">In Progress</option>
-              <option value="gap_critical" className="bg-slate-900">Critical Gap</option>
-              <option value="not_started" className="bg-slate-900">Not Started</option>
+              <option value="all" className="bg-tertiary-900">All Statuses</option>
+              <option value="compliant" className="bg-tertiary-900">Compliant</option>
+              <option value="in_progress" className="bg-tertiary-900">In Progress</option>
+              <option value="gap_critical" className="bg-tertiary-900">Critical Gap</option>
+              <option value="not_started" className="bg-tertiary-900">Not Started</option>
             </select>
           </div>
         </div>
@@ -256,7 +256,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
       {/* Checklist Items List */}
       <div className="space-y-4">
         {filteredItems.length === 0 ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center text-slate-500 text-xs">
+          <div className="bg-tertiary-900 border border-tertiary-800 rounded-2xl p-8 text-center text-slate-500 text-xs">
             No checklist items match the current filters.
           </div>
         ) : (
@@ -267,10 +267,10 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                 item.status === 'gap_critical'
                   ? 'bg-rose-950/20 border-rose-900/60'
                   : item.status === 'in_progress'
-                  ? 'bg-blue-950/20 border-blue-900/60'
+                  ? 'bg-primary-950/20 border-primary-900/60'
                   : item.status === 'compliant'
-                  ? 'bg-slate-900 border-slate-800'
-                  : 'bg-slate-900/60 border-slate-800'
+                  ? 'bg-tertiary-900 border-tertiary-800'
+                  : 'bg-tertiary-900/60 border-tertiary-800'
               }`}
             >
               <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
@@ -278,7 +278,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                     <span className="text-sm font-bold text-white">{item.title}</span>
-                    <span className="text-[10px] bg-slate-800 text-slate-300 font-semibold px-2 py-0.5 rounded border border-slate-700">
+                    <span className="text-[10px] bg-tertiary-800 text-slate-300 font-semibold px-2 py-0.5 rounded border border-tertiary-700">
                       {item.regulatoryBody}
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">
@@ -289,7 +289,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                         href={item.sourceUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-sky-400 hover:underline text-[10px] inline-flex items-center gap-1 font-medium"
+                        className="text-primary-400 hover:underline text-[10px] inline-flex items-center gap-1 font-medium"
                       >
                         <span>gov.uk guide</span>
                         <ExternalLink className="w-3 h-3" />
@@ -301,10 +301,10 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
 
                   {/* Section 5: Plain Language Guidance */}
                   {item.plainLanguageHelp && (
-                    <div className="text-xs bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-slate-300 flex items-start gap-2">
-                      <HelpCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <div className="text-xs bg-tertiary-950/70 border border-tertiary-800 rounded-xl p-3 text-slate-300 flex items-start gap-2">
+                      <HelpCircle className="w-4 h-4 text-primary-400 shrink-0 mt-0.5" />
                       <div>
-                        <strong className="text-white font-semibold block text-[11px] uppercase tracking-wider text-emerald-400">
+                        <strong className="text-white font-semibold block text-[11px] uppercase tracking-wider text-primary-400">
                           What an Auditor Looks For & How to Pass:
                         </strong>
                         <span className="text-slate-300 leading-relaxed">{item.plainLanguageHelp}</span>
@@ -325,14 +325,14 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   <div className="pt-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-400 flex items-center gap-1.5">
-                        <Paperclip className="w-3.5 h-3.5 text-emerald-400" />
+                        <Paperclip className="w-3.5 h-3.5 text-primary-400" />
                         <span>Attached Evidence Files ({item.attachments?.length || (item.evidenceDocumented ? 1 : 0)})</span>
                       </span>
                       {!readOnly && (
                         <button
                           type="button"
                           onClick={() => setAttachingToId(attachingToId === item.id ? null : item.id)}
-                          className="text-xs text-emerald-400 hover:underline font-semibold inline-flex items-center gap-1"
+                          className="text-xs text-primary-400 hover:underline font-semibold inline-flex items-center gap-1"
                         >
                           <Upload className="w-3 h-3" />
                           <span>{attachingToId === item.id ? 'Cancel Upload' : 'Attach Document'}</span>
@@ -342,7 +342,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
 
                     {/* Inline Attachment Form */}
                     {attachingToId === item.id && (
-                      <div className="mt-2.5 p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-2 text-xs">
+                      <div className="mt-2.5 p-3 bg-tertiary-950 border border-tertiary-800 rounded-xl space-y-2 text-xs">
                         <span className="font-bold text-white block">Attach Document / Verification Record</span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           <input
@@ -350,28 +350,28 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                             placeholder="Document name (e.g. Fire Risk Assessment 2026.pdf)"
                             value={docName}
                             onChange={(e) => setDocName(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs"
+                            className="bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-primary-500"
                           />
                           <input
                             type="text"
                             placeholder="Inspection notes or certificate ref"
                             value={docNotes}
                             onChange={(e) => setDocNotes(e.target.value)}
-                            className="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs"
+                            className="bg-tertiary-900 border border-tertiary-700 rounded-lg px-2.5 py-1.5 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-primary-500"
                           />
                         </div>
                         <div className="flex justify-end gap-2 pt-1">
                           <button
                             type="button"
                             onClick={() => setAttachingToId(null)}
-                            className="px-2.5 py-1 bg-slate-800 text-slate-300 rounded text-xs"
+                            className="px-2.5 py-1 bg-tertiary-800 text-slate-300 rounded text-xs hover:bg-tertiary-700"
                           >
                             Cancel
                           </button>
                           <button
                             type="button"
                             onClick={() => handleAttachDocument(item.id)}
-                            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-xs"
+                            className="px-3 py-1 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded text-xs"
                           >
                             Attach File
                           </button>
@@ -385,7 +385,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                         {item.attachments.map((att) => (
                           <div
                             key={att.id}
-                            className="p-2 bg-slate-950 border border-slate-800 rounded-lg flex items-center justify-between text-xs"
+                            className="p-2 bg-tertiary-950 border border-tertiary-800 rounded-lg flex items-center justify-between text-xs"
                           >
                             <div className="flex items-center gap-2">
                               <FileCheck className="w-4 h-4 text-emerald-400" />
@@ -423,7 +423,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                 </div>
 
                 {/* Right: Controls (Status Selector, Evidence Toggle, Review Date) */}
-                <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-3 shrink-0 lg:w-64 border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-800">
+                <div className="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-3 shrink-0 lg:w-64 border-t lg:border-t-0 pt-3 lg:pt-0 border-tertiary-800">
                   {/* Status Dropdown */}
                   <div className="w-full sm:w-auto lg:w-full">
                     <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">
@@ -440,10 +440,10 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                         item.status === 'compliant'
                           ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
                           : item.status === 'in_progress'
-                          ? 'bg-blue-950 text-blue-300 border-blue-800'
+                          ? 'bg-primary-950 text-primary-300 border-primary-800'
                           : item.status === 'gap_critical'
                           ? 'bg-rose-950 text-rose-300 border-rose-800'
-                          : 'bg-slate-950 text-slate-400 border-slate-800'
+                          : 'bg-tertiary-950 text-slate-400 border-tertiary-800'
                       }`}
                     >
                       <option value="compliant">Compliant (100%)</option>
@@ -461,10 +461,10 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                       disabled={readOnly}
                       checked={item.evidenceDocumented}
                       onChange={(e) => onUpdateItem(item.id, { evidenceDocumented: e.target.checked })}
-                      className="rounded border-slate-700 bg-slate-950 text-emerald-600 focus:ring-emerald-500"
+                      className="rounded border-tertiary-700 bg-tertiary-950 text-primary-600 focus:ring-primary-500"
                     />
                     <span className="font-medium flex items-center space-x-1">
-                      <FileCheck className="h-3.5 w-3.5 text-emerald-400" />
+                      <FileCheck className="h-3.5 w-3.5 text-primary-400" />
                       <span>Evidence Attached / Signed</span>
                     </span>
                   </label>
@@ -485,7 +485,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
               </div>
 
               {/* Bottom: Inline Manager Notes */}
-              <div className="mt-3.5 pt-3.5 border-t border-slate-800/80 flex items-center space-x-2 text-xs">
+              <div className="mt-3.5 pt-3.5 border-t border-tertiary-800/80 flex items-center space-x-2 text-xs">
                 <span className="text-slate-400 font-semibold shrink-0">Manager Notes:</span>
                 <input
                   id={`notes-${item.id}`}
@@ -494,7 +494,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   placeholder="Record policy numbers, audit dates, contractor names, or remediation actions..."
                   value={item.managerNotes}
                   onChange={(e) => onUpdateItem(item.id, { managerNotes: e.target.value })}
-                  className="w-full bg-slate-950 hover:bg-slate-800/60 focus:bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-none text-xs transition-colors"
+                  className="w-full bg-tertiary-950 hover:bg-tertiary-800/60 focus:bg-tertiary-950 border border-tertiary-800 focus:border-primary-500 rounded-lg px-3 py-1.5 text-slate-200 placeholder-slate-500 focus:outline-none text-xs transition-colors"
                 />
               </div>
             </div>
@@ -505,7 +505,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
       {/* Add Custom Item Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-700 text-slate-100">
+          <div className="bg-tertiary-900 rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-tertiary-700 text-slate-100">
             <h3 className="text-base font-bold text-white mb-1">
               Add Custom Manager Checklist Item
             </h3>
@@ -524,7 +524,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   placeholder="e.g. Annual Legionella Risk Assessment & Flushing Log"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-2 text-white focus:border-primary-500 focus:outline-none"
                 />
               </div>
 
@@ -537,7 +537,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   placeholder="Describe the required procedure or physical file to inspect..."
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-2 text-white focus:border-primary-500 focus:outline-none"
                 />
               </div>
 
@@ -550,7 +550,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   placeholder="e.g. Must show signed water temperature test records conducted every 30 days."
                   value={newHelp}
                   onChange={(e) => setNewHelp(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-2 text-white focus:border-primary-500 focus:outline-none"
                 />
               </div>
 
@@ -563,7 +563,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                     type="text"
                     value={newRegBody}
                     onChange={(e) => setNewRegBody(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:border-emerald-500 focus:outline-none"
+                    className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-1.5 text-white focus:border-primary-500 focus:outline-none"
                   />
                 </div>
 
@@ -575,7 +575,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                     type="text"
                     value={newLegalRef}
                     onChange={(e) => setNewLegalRef(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:border-emerald-500 focus:outline-none"
+                    className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-1.5 text-white focus:border-primary-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -587,7 +587,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                 <select
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value as ChecklistCategory)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-1.5 text-white focus:border-primary-500 focus:outline-none"
                 >
                   <option value="sector_specific">Sector Specific</option>
                   <option value="universal_hse">HSE Workplace Safety</option>
@@ -605,7 +605,7 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   type="text"
                   value={newPenaltyText}
                   onChange={(e) => setNewPenaltyText(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-1.5 text-white focus:border-primary-500 focus:outline-none"
                 />
               </div>
 
@@ -618,21 +618,21 @@ export const ManagerChecklistsView: React.FC<ManagerChecklistsViewProps> = ({
                   placeholder="https://www.hse.gov.uk/..."
                   value={newSourceUrl}
                   onChange={(e) => setNewSourceUrl(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-white focus:border-emerald-500 focus:outline-none"
+                  className="w-full bg-tertiary-950 border border-tertiary-800 rounded-lg px-3 py-1.5 text-white focus:border-primary-500 focus:outline-none"
                 />
               </div>
 
-              <div className="flex justify-end space-x-2 pt-3 border-t border-slate-800">
+              <div className="flex justify-end space-x-2 pt-3 border-t border-tertiary-800">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-3 py-2 rounded-lg border border-slate-700 text-slate-300 font-medium hover:bg-slate-800"
+                  className="px-3 py-2 rounded-lg border border-tertiary-700 text-slate-300 font-medium hover:bg-tertiary-800"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500 shadow-sm"
+                  className="px-4 py-2 rounded-lg bg-primary-600 text-white font-bold hover:bg-primary-500 shadow-sm"
                 >
                   Save Checklist Item
                 </button>

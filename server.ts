@@ -220,6 +220,11 @@ async function startServer() {
     const l = req.body;
     const businessId = req.params.id;
     const id = l.id || `lrn-${Date.now()}`;
+    const name = (l.name || l.fullName || 'Staff Member').trim();
+    const email = (l.email || `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@business.co.uk`).trim();
+    const roleLevel = ['manager', 'supervisor', 'field_worker', 'admin'].includes(l.roleLevel)
+      ? l.roleLevel
+      : 'field_worker';
 
     const insertLearner = db.prepare(`
       INSERT INTO learners (
@@ -231,9 +236,9 @@ async function startServer() {
     insertLearner.run(
       id,
       businessId,
-      l.name,
-      l.email,
-      l.roleLevel,
+      name,
+      email,
+      roleLevel,
       l.jobTitle || '',
       l.department || '',
       l.startDate || new Date().toISOString().split('T')[0],
@@ -243,6 +248,13 @@ async function startServer() {
     );
 
     if (Array.isArray(l.courses)) {
+      const ensureCourse = db.prepare(`
+        INSERT OR IGNORE INTO courses (
+          id, code, title, sector, regulatory_driver, target_roles_json,
+          duration_hours, accreditation, renewal_months, is_mandatory_by_law
+        ) VALUES (?, ?, ?, 'universal', 'Statutory workplace training standard', '["field_worker","manager","supervisor","admin"]', 2, 'Accredited', 12, 1)
+      `);
+
       const insertRecord = db.prepare(`
         INSERT INTO learner_course_records (
           id, learner_id, course_id, course_title, status, progress_percent,
@@ -251,12 +263,14 @@ async function startServer() {
       `);
 
       for (const c of l.courses) {
+        if (!c.courseId) continue;
+        ensureCourse.run(c.courseId, c.courseId.toUpperCase(), c.courseTitle || c.courseId);
         insertRecord.run(
           `rec-${id}-${c.courseId}`,
           id,
           c.courseId,
-          c.courseTitle,
-          c.status,
+          c.courseTitle || c.courseId,
+          c.status || 'in_progress',
           c.progressPercent || 0,
           c.completedDate || null,
           c.expiryDate || null,
@@ -334,6 +348,18 @@ async function startServer() {
   app.post('/api/business/:id/learners/:learnerId/courses', (req, res) => {
     const { courseId, courseTitle, status, progressPercent, completedDate, expiryDate, score } = req.body;
     const learnerId = req.params.learnerId;
+
+    if (!courseId) {
+      return res.status(400).json({ error: 'Course ID is required' });
+    }
+
+    // Ensure course exists to prevent SQLite foreign key constraint failure
+    db.prepare(`
+      INSERT OR IGNORE INTO courses (
+        id, code, title, sector, regulatory_driver, target_roles_json,
+        duration_hours, accreditation, renewal_months, is_mandatory_by_law
+      ) VALUES (?, ?, ?, 'universal', 'Statutory workplace training standard', '["field_worker","manager","supervisor","admin"]', 2, 'Accredited', 12, 1)
+    `).run(courseId, courseId.toUpperCase(), courseTitle || courseId);
 
     const upsertStmt = db.prepare(`
       INSERT INTO learner_course_records (
@@ -461,7 +487,10 @@ async function startServer() {
 
     if (rawChecklists.length === 0) {
       const biz = db.prepare('SELECT sector FROM businesses WHERE id = ?').get(req.params.id) as any;
-      const sector = biz?.sector || 'general_business';
+      if (!biz) {
+        return res.status(404).json({ error: 'Business not found' });
+      }
+      const sector = biz.sector || 'general_business';
       const templates = db.prepare(`
         SELECT * FROM checklist_templates
         WHERE sector_applicability = 'universal' OR sector_applicability = ?
@@ -522,6 +551,74 @@ async function startServer() {
     }));
 
     res.json(formatted);
+  });
+
+  app.post('/api/business/:id/checklists', (req, res) => {
+    const c = req.body;
+    const businessId = req.params.id;
+    const id = c.id || `chk-${businessId}-${Date.now()}`;
+
+    const stmt = db.prepare(`
+      INSERT INTO checklist_items (
+        id, business_id, category, sector, title, description,
+        plain_language_help, regulatory_body, legal_reference, status,
+        manager_notes, evidence_documented, attachments_json, penalty_risk_text,
+        scoring_weight, last_verified_date, source_url, is_custom_client_override
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+    `);
+
+    stmt.run(
+      id,
+      businessId,
+      c.category || 'universal_hse',
+      c.sector || null,
+      c.title,
+      c.description || '',
+      c.plainLanguageHelp || '',
+      c.regulatoryBody || 'HSE',
+      c.legalReference || 'Health and Safety at Work etc. Act 1974',
+      c.status || 'pending_review',
+      c.managerNotes || '',
+      c.evidenceDocumented ? 1 : 0,
+      JSON.stringify(c.attachments || []),
+      c.penaltyRiskText || '',
+      c.scoringWeight || 3,
+      c.lastVerifiedDate || new Date().toISOString().split('T')[0],
+      c.sourceUrl || null
+    );
+
+    res.json({ success: true, id });
+  });
+
+  // Batch update checklists
+  app.put('/api/business/:id/checklists', (req, res) => {
+    const items = Array.isArray(req.body) ? req.body : [req.body];
+    const now = new Date().toISOString().split('T')[0];
+    const stmt = db.prepare(`
+      UPDATE checklist_items SET
+        status = ?,
+        manager_notes = ?,
+        evidence_documented = ?,
+        last_reviewed_date = ?,
+        attachments_json = ?
+      WHERE id = ? AND business_id = ?
+    `);
+
+    for (const c of items) {
+      if (c && c.id) {
+        stmt.run(
+          c.status || 'not_started',
+          c.managerNotes || '',
+          c.evidenceDocumented ? 1 : 0,
+          now,
+          JSON.stringify(c.attachments || []),
+          c.id,
+          req.params.id
+        );
+      }
+    }
+
+    res.json({ success: true, count: items.length, lastReviewedDate: now });
   });
 
   app.put('/api/business/:id/checklists/:checklistId', (req, res) => {
@@ -760,7 +857,7 @@ async function startServer() {
       s.criticalGapsCount || 0,
       s.expiredCertsCount || 0,
       s.summary || 'Audit report snapshot saved.',
-      JSON.stringify(s.reportJson || {})
+      typeof s.reportJson === 'string' ? s.reportJson : JSON.stringify(s.reportJson || {})
     );
 
     res.json({ success: true, id, timestamp });
@@ -843,6 +940,7 @@ async function startServer() {
       DELETE FROM learner_course_records;
       DELETE FROM learners;
       DELETE FROM checklist_items;
+      DELETE FROM checklist_templates;
       DELETE FROM courses;
       DELETE FROM businesses;
       DELETE FROM tenants;

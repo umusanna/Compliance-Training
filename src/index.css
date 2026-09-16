@@ -1,1 +1,55 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f0f4fa;
+  --color-primary-100: #cfddee;
+  --color-primary-200: #b8cce6;
+  --color-primary-300: #97b5da;
+  --color-primary-400: #83a7d3;
+  --color-primary-500: #6491c8;
+  --color-primary-600: #5b84bd;
+  --color-primary-700: #47678c;
+  --color-primary-800: #37506e;
+  --color-primary-900: #2a3d54;
+  --color-primary-950: #131d28;
+
+  --color-secondary-smooth: #fffcf7;
+  --color-secondary-50: #fef6e8;
+  --color-secondary-100: #fde2b8;
+  --color-secondary-200: #fcd596;
+  --color-secondary-300: #fbc166;
+  --color-secondary-400: #fab548;
+  --color-secondary-500: #f9a31a;
+  --color-secondary-600: #e39418;
+  --color-secondary-700: #b17412;
+  --color-secondary-800: #895a0e;
+  --color-secondary-900: #69440b;
+  --color-secondary-950: #3b2404;
+
+  --color-tertiary-50: #ebeef1;
+  --color-tertiary-100: #c1c9d2;
+  --color-tertiary-200: #a3afbc;
+  --color-tertiary-300: #798a9e;
+  --color-tertiary-400: #5f738b;
+  --color-tertiary-500: #37506e;
+  --color-tertiary-600: #324964;
+  --color-tertiary-700: #27394e;
+  --color-tertiary-800: #1e2c3d;
+  --color-tertiary-900: #17222e;
+  --color-tertiary-950: #0f1720;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}

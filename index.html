@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        try {
+          var _orig = window.fetch ? window.fetch.bind(window) : null;
+          var _current = _orig;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return _current;
+            },
+            set: function(fn) {
+              _current = fn;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } catch (e) {
+          // Continue if already configurable
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compliance Status Checker</title>
+    <meta name="description" content="UK regulatory compliance audit preparation and learner training gap analysis dashboard across Food Hygiene, CQC Care, FCA Finance, Construction CDM, and Universal workplace standards." />
+    <meta property="og:title" content="Compliance Status Checker" />
+    <meta property="og:description" content="UK regulatory compliance audit preparation and learner training gap analysis dashboard across Food Hygiene, CQC Care, FCA Finance, Construction CDM, and Universal workplace standards." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

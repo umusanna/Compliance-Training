@@ -1,0 +1,8 @@
+{
+  "name": "Compliance Status Checker",
+  "description": "UK regulatory compliance audit preparation and learner training gap analysis dashboard across Food Hygiene, CQC Care, FCA Finance, Construction CDM, and Universal workplace standards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
